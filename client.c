@@ -16,9 +16,10 @@ int main() {
 
     // 2. Find tcp server via dns lookup
     const char *url = "www.catinella.co.uk";
-    const char *port = "5000";
+    const char *port = "2000";
     struct addrinfo *addresses;
     dnsLookup(url, port, &addresses);
+    printf("Trying connection...\n");
 
     // 3. Iteration through possible protocals
     struct addrinfo *addr;
@@ -33,6 +34,7 @@ int main() {
         }
 
         if (connect(fd, addr->ai_addr, addr->ai_addrlen) == -1) {
+            printf("Couldn't connect \n");
             close(fd);
             continue;
         }
@@ -47,7 +49,7 @@ int main() {
 
     // 4. Send data to Server
     char *data = "Hello world!";
-    size_t data_len = sizeof(data);
+    size_t data_len = strlen(data) * sizeof(char);
     int flags = MSG_NOSIGNAL;
 
     if (send(fd, data, data_len, flags) == -1) {
