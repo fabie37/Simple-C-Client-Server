@@ -24,7 +24,7 @@ int main() {
     struct sockaddr_in addr = {
         .sin_family = AF_INET,          // IPV4
         .sin_addr.s_addr = INADDR_ANY,  // Any avail network interface
-        .sin_port = htons(5000)         // Port
+        .sin_port = htons(2000)         // Port
     };
 
     if (bind(fd, (struct sockaddr *)&addr, sizeof(addr)) == -1) {
@@ -50,17 +50,30 @@ int main() {
             perror("Failed to connect with incomming client.");
         }
 
+	printf("Accepted a connection!\n");
+
         // 5. Read Data from client
         ssize_t rcount;
+	int recvCount = 0;
         char buf[BUFLEN];
+	memset(buf, 0, BUFLEN);
         int flags = 0;  // No flags set
 
+	
         rcount = recv(connfd, buf, BUFLEN, flags);
+	while (rcount > 0) {
+		printf("Count: %ld\n", rcount);
+		recvCount += rcount;
+		rcount = recv(connfd, buf+recvCount, BUFLEN,flags);
+	}
         if (rcount == -1) {
             printf("Failed to read data from client.\n");
         }
-        buf[BUFLEN - 1] = '\0';
-        printf("%s", buf);
+	printf("Got something!\n");
+        for (int i=0; i<BUFLEN; i++) {
+		printf("%c",buf[i]);
+	}
+	printf("\nEnd of message\n");
         close(connfd);
     }
 }
